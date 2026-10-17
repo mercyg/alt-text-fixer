@@ -53,6 +53,23 @@ Try it on the included demo: `python alt_text_fixer.py demo --dry-run`
 
 Flags: `--dry-run`, `--include-remote` (also describe images hosted at URLs), `--backend`.
 
+## Use it in any repo (GitHub Action)
+Add a repo secret `GEMINI_API_KEY`, then create `.github/workflows/alt-text.yml`:
+```yaml
+name: Alt text
+on: [workflow_dispatch]
+permissions: { contents: write, pull-requests: write }
+jobs:
+  alt-text:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mercyg/alt-text-fixer@master
+        with:
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+```
+Run it from the Actions tab and it opens a PR with the new alt text. Set `open-pr: false` to only report the diff in the job summary. Full example: [`examples/alt-text.yml`](examples/alt-text.yml).
+
 ## How it works
 1. Walk the repo (skipping `node_modules`, `.git`, build output) for `.md`, `.mdx` and `.html` files.
 2. Regex out every image; keep only ones whose alt is empty, generic, or just the filename.
@@ -72,3 +89,4 @@ pytest -q
 
 ## License
 MIT
+
